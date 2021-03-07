@@ -2,10 +2,10 @@ package ir.fallahpoor.composecalendar
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,29 +36,43 @@ private enum class DayOfWeek(val value: Int) {
 fun Calendar() {
 
     val calendar = Calendar.getInstance()
-    val startOfMonthCalendar = Calendar.getInstance()
-    startOfMonthCalendar.set(Calendar.DATE, 1)
-    var currentDayOfMonth: Int by remember { mutableStateOf(calendar.get(Calendar.DATE)) }
+    val calendarStartOfMonth = Calendar.getInstance().apply {
+        set(Calendar.DATE, 1)
+    }
+    var currentDayOfMonth: Int by remember { mutableStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
+    var currentMonthName: String by remember { mutableStateOf(getMonthName(calendar)) }
 
     ComposeCalendarTheme {
         Surface {
-            val monthName = SimpleDateFormat("MMMM").format(calendar.time)
             CalendarScreen(
                 currentYear = calendar.get(Calendar.YEAR),
-                currentMonthName = monthName,
+                currentMonthName = currentMonthName,
                 currentDayOfMonth = currentDayOfMonth,
                 numberOfDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH),
-                startOfMonthDayOfWeek = getDayOfWeek(startOfMonthCalendar.get(Calendar.DAY_OF_WEEK)),
+                startOfMonthDayOfWeek = getDayOfWeek(calendarStartOfMonth.get(Calendar.DAY_OF_WEEK)),
                 onDayClick = { selectedDayOfMonth: Int ->
                     if (selectedDayOfMonth != currentDayOfMonth) {
                         currentDayOfMonth = selectedDayOfMonth
                     }
+                },
+                onPreviousMonthClick = {
+                    calendar.add(Calendar.MONTH, -1)
+                    calendarStartOfMonth.add(Calendar.MONTH, -1)
+                    currentMonthName = getMonthName(calendar)
+                },
+                onNextMonthClick = {
+                    calendar.add(Calendar.MONTH, 1)
+                    calendarStartOfMonth.add(Calendar.MONTH, 1)
+                    currentMonthName = getMonthName(calendar)
                 }
             )
         }
     }
 
 }
+
+private fun getMonthName(calendar: Calendar): String =
+    SimpleDateFormat("MMMM").format(calendar.time)
 
 private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek {
     return when (dayOfWeek) {
@@ -80,14 +94,18 @@ private fun CalendarScreen(
     currentDayOfMonth: Int,
     numberOfDaysInMonth: Int,
     startOfMonthDayOfWeek: DayOfWeek,
-    onDayClick: (Int) -> Unit
+    onDayClick: (Int) -> Unit,
+    onPreviousMonthClick: () -> Unit,
+    onNextMonthClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         Header(
             currentYear = currentYear,
-            currentMonth = currentMonthName
+            currentMonth = currentMonthName,
+            onPreviousMonthClick = onPreviousMonthClick,
+            onNextMonthClick = onNextMonthClick
         )
         WeekDays()
         Divider()
@@ -101,14 +119,40 @@ private fun CalendarScreen(
 }
 
 @Composable
-private fun Header(currentYear: Int, currentMonth: String) {
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        text = "$currentMonth $currentYear",
-        textAlign = TextAlign.Center
-    )
+private fun Header(
+    currentYear: Int,
+    currentMonth: String,
+    onPreviousMonthClick: () -> Unit,
+    onNextMonthClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = onPreviousMonthClick
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowLeft,
+                contentDescription = "Previous Month"
+            )
+        }
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp),
+            text = "$currentMonth $currentYear",
+            textAlign = TextAlign.Center
+        )
+        IconButton(
+            onClick = onNextMonthClick
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Next Month"
+            )
+        }
+    }
 }
 
 @Composable
@@ -268,7 +312,9 @@ private fun CalendarScreenPreview() {
                 numberOfDaysInMonth = 30,
                 startOfMonthDayOfWeek = DayOfWeek.Sunday,
                 currentDayOfMonth = 20,
-                onDayClick = {}
+                onDayClick = {},
+                onPreviousMonthClick = {},
+                onNextMonthClick = {}
             )
         }
     }
