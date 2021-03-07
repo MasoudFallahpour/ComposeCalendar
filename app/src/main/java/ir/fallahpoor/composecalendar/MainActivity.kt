@@ -8,6 +8,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            CalendarScreen(
+                currentYear = 1399,
+                currentMonth = "Esfand"
+            )
         }
     }
 }
