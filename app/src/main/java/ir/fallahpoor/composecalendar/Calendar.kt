@@ -1,51 +1,59 @@
 package ir.fallahpoor.composecalendar
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.aminography.primecalendar.common.CalendarFactory
-import com.aminography.primecalendar.common.CalendarType
 import ir.fallahpoor.composecalendar.ui.theme.ComposeCalendarTheme
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.ceil
+
+// FIXME: In landscape mode, calendar is not scrollable
 
 private const val NUM_WEEK_DAYS = 7
 
 private enum class DayOfWeek(val value: Int) {
-    Shanbe(0),
-    YekShanbe(1),
-    DoShanbe(2),
-    SeShanbe(3),
-    ChaharShanbe(4),
-    PanjShanbe(5),
-    Jome(6)
+    Monday(0),
+    Tuesday(1),
+    Wednesday(2),
+    Thursday(3),
+    Friday(4),
+    Saturday(5),
+    Sunday(6),
 }
 
 @Composable
 fun Calendar() {
 
-    val calendar = CalendarFactory.newInstance(CalendarType.PERSIAN)
-    val startOfMonthCalendar = CalendarFactory.newInstance(CalendarType.PERSIAN)
-    startOfMonthCalendar.dayOfMonth = 1
+    val calendar = Calendar.getInstance()
+    val startOfMonthCalendar = Calendar.getInstance()
+    startOfMonthCalendar.set(Calendar.DATE, 1)
+    var currentDayOfMonth: Int by remember { mutableStateOf(calendar.get(Calendar.DATE)) }
 
     ComposeCalendarTheme {
         Surface {
+            val monthName = SimpleDateFormat("MMMM").format(calendar.time)
             CalendarScreen(
-                currentYear = calendar.year,
-                currentMonthName = calendar.monthName,
-                currentDayOfMonth = calendar.dayOfMonth,
-                numberOfDaysInMonth = calendar.getActualMaximum(java.util.Calendar.DAY_OF_MONTH),
-                startOfMonthDayOfWeek = getDayOfWeek(startOfMonthCalendar.dayOfWeek)
+                currentYear = calendar.get(Calendar.YEAR),
+                currentMonthName = monthName,
+                currentDayOfMonth = currentDayOfMonth,
+                numberOfDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH),
+                startOfMonthDayOfWeek = getDayOfWeek(startOfMonthCalendar.get(Calendar.DAY_OF_WEEK)),
+                onDayClick = { selectedDayOfMonth: Int ->
+                    if (selectedDayOfMonth != currentDayOfMonth) {
+                        currentDayOfMonth = selectedDayOfMonth
+                    }
+                }
             )
         }
     }
@@ -54,14 +62,14 @@ fun Calendar() {
 
 private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek {
     return when (dayOfWeek) {
-        0 -> DayOfWeek.Shanbe
-        1 -> DayOfWeek.YekShanbe
-        2 -> DayOfWeek.DoShanbe
-        3 -> DayOfWeek.SeShanbe
-        4 -> DayOfWeek.ChaharShanbe
-        5 -> DayOfWeek.PanjShanbe
-        6 -> DayOfWeek.Jome
-        else -> throw IllegalArgumentException("dayOfWeek must be in range [0..6]")
+        1 -> DayOfWeek.Sunday
+        2 -> DayOfWeek.Monday
+        3 -> DayOfWeek.Tuesday
+        4 -> DayOfWeek.Wednesday
+        5 -> DayOfWeek.Thursday
+        6 -> DayOfWeek.Friday
+        7 -> DayOfWeek.Saturday
+        else -> throw IllegalArgumentException("dayOfWeek must be in range [1..7]")
     }
 }
 
@@ -71,7 +79,8 @@ private fun CalendarScreen(
     currentMonthName: String,
     currentDayOfMonth: Int,
     numberOfDaysInMonth: Int,
-    startOfMonthDayOfWeek: DayOfWeek
+    startOfMonthDayOfWeek: DayOfWeek,
+    onDayClick: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -86,9 +95,7 @@ private fun CalendarScreen(
             currentDayOfMonth = currentDayOfMonth,
             numberOfDaysInMonth = numberOfDaysInMonth,
             startOfMonthDayOfWeek = startOfMonthDayOfWeek,
-            onDayClick = {
-                Log.d("@@@@@@", "Day $it clicked")
-            }
+            onDayClick = onDayClick
         )
     }
 }
@@ -99,7 +106,7 @@ private fun Header(currentYear: Int, currentMonth: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        text = "$currentYear $currentMonth",
+        text = "$currentMonth $currentYear",
         textAlign = TextAlign.Center
     )
 }
@@ -113,7 +120,7 @@ private fun WeekDays() {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            val weekdays = listOf("ش", "ی", "د", "س", "چ", "پ", "ج")
+            val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
             weekdays.forEach {
                 WeekDay(
                     modifier = Modifier
@@ -256,11 +263,12 @@ private fun CalendarScreenPreview() {
     ComposeCalendarTheme {
         Surface {
             CalendarScreen(
-                currentYear = 1399,
-                currentMonthName = "اسفند",
+                currentYear = 2021,
+                currentMonthName = "June",
                 numberOfDaysInMonth = 30,
-                startOfMonthDayOfWeek = DayOfWeek.SeShanbe,
-                currentDayOfMonth = 20
+                startOfMonthDayOfWeek = DayOfWeek.Sunday,
+                currentDayOfMonth = 20,
+                onDayClick = {}
             )
         }
     }

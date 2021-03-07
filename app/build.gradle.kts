@@ -53,7 +53,6 @@ dependencies {
     implementation(Dependencies.App.lifecycle)
     implementation(Dependencies.App.material)
     implementation(Dependencies.App.activityCompose)
-    implementation(Dependencies.App.primeCalendar)
     implementation(Dependencies.App.composeUi)
     implementation(Dependencies.App.composeMaterial)
     implementation(Dependencies.App.composeTooling)
