@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,6 +47,8 @@ private val monthNames = listOf(
     "November",
     "December"
 )
+
+val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 @Composable
 fun Calendar() {
@@ -105,17 +106,15 @@ fun Calendar() {
 
 }
 
-private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek {
-    return when (dayOfWeek) {
-        1 -> DayOfWeek.Sunday
-        2 -> DayOfWeek.Monday
-        3 -> DayOfWeek.Tuesday
-        4 -> DayOfWeek.Wednesday
-        5 -> DayOfWeek.Thursday
-        6 -> DayOfWeek.Friday
-        7 -> DayOfWeek.Saturday
-        else -> throw IllegalArgumentException("dayOfWeek must be in range [1..7]")
-    }
+private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek = when (dayOfWeek) {
+    1 -> DayOfWeek.Sunday
+    2 -> DayOfWeek.Monday
+    3 -> DayOfWeek.Tuesday
+    4 -> DayOfWeek.Wednesday
+    5 -> DayOfWeek.Thursday
+    6 -> DayOfWeek.Friday
+    7 -> DayOfWeek.Saturday
+    else -> throw IllegalArgumentException("dayOfWeek must be in range [1..7]")
 }
 
 @Composable
@@ -209,13 +208,12 @@ private fun WeekDays() {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-            weekdays.forEach {
+            weekdays.forEach { weekDay: String ->
                 WeekDay(
                     modifier = Modifier
                         .requiredWidth(size)
                         .requiredHeight(size),
-                    text = it
+                    text = weekDay
                 )
             }
         }
@@ -263,7 +261,7 @@ private fun MonthDays(
             MonthDaysRow(
                 startColumn = startColumn,
                 endColumn = endColumn,
-                startDay = startDay,
+                fromDay = startDay,
                 currentYear = currentYear,
                 currentMonth = currentMonth,
                 todayYear = todayYear,
@@ -283,7 +281,7 @@ private fun MonthDays(
 private fun MonthDaysRow(
     startColumn: Int, // 0..6
     endColumn: Int,   // 0..6 && startColumn <= endColumn
-    startDay: Int,    // 1..31
+    fromDay: Int,    // 1..31
     currentYear: Int,
     currentMonth: Int,
     todayYear: Int,
@@ -302,7 +300,7 @@ private fun MonthDaysRow(
         val modifier = Modifier
             .requiredWidth(size)
             .requiredHeight(size)
-        var currentDay = startDay
+        var currentDay = fromDay
 
         Row {
             repeat(NUM_WEEK_DAYS) { index: Int ->
@@ -336,18 +334,9 @@ private fun Day(
     isHoliday: Boolean,
     onDayClick: (Int) -> Unit
 ) {
-    val color: Color
-    val shape: Shape
-    if (isSelected) {
-        color = MaterialTheme.colors.primary
-        shape = MaterialTheme.shapes.medium
-    } else {
-        color = Color.Unspecified
-        shape = RectangleShape
-    }
     Surface(
-        color = color,
-        shape = shape
+        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
+        shape = if (isSelected) MaterialTheme.shapes.medium else RectangleShape
     ) {
         var localModifier = modifier
             .clickable {
@@ -364,12 +353,11 @@ private fun Day(
             modifier = localModifier,
             contentAlignment = Alignment.Center
         ) {
-            val textColor = if (isHoliday) Color.Red else Color.Unspecified
             Text(
                 text = day.toString(),
                 maxLines = 1,
                 textAlign = TextAlign.Center,
-                color = textColor
+                color = if (isHoliday) Color.Red else Color.Unspecified
             )
         }
     }
@@ -400,7 +388,7 @@ private fun CalendarScreenPreview() {
                 todayMonth = 2,
                 todayDayOfMonth = 12,
                 selectedYear = 2021,
-                selectedMonth = 12,
+                selectedMonth = 2,
                 selectedDayOfMonth = 20,
                 startOfMonthDayOfWeek = DayOfWeek.Sunday,
                 onDateClick = { _, _, _ -> },
