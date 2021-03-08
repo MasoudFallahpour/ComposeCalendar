@@ -1,8 +1,9 @@
 package ir.fallahpoor.composecalendar
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -10,20 +11,17 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import ir.fallahpoor.composecalendar.composables.DaysSheet
+import ir.fallahpoor.composecalendar.composables.WeekDayNames
 import ir.fallahpoor.composecalendar.ui.theme.ComposeCalendarTheme
 import java.util.*
-import kotlin.math.ceil
 
 // FIXME: In landscape mode, calendar is not scrollable
 
-private const val NUM_WEEK_DAYS = 7
-
-private enum class DayOfWeek(val value: Int) {
+enum class DayOfWeek(val value: Int) {
     Monday(0),
     Tuesday(1),
     Wednesday(2),
@@ -47,8 +45,6 @@ private val monthNames = listOf(
     "November",
     "December"
 )
-
-val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 @Composable
 fun Calendar() {
@@ -142,9 +138,9 @@ private fun CalendarScreen(
             onPreviousMonthClick = onPreviousMonthClick,
             onNextMonthClick = onNextMonthClick
         )
-        WeekDays()
+        WeekDayNames()
         Divider()
-        MonthDays(
+        DaysSheet(
             currentYear = currentYear,
             currentMonth = currentMonth,
             currentMonthNumberOfDays = currentMonthNumberOfDays,
@@ -197,182 +193,6 @@ private fun Header(
             )
         }
     }
-}
-
-@Composable
-private fun WeekDays() {
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        val size = maxWidth / NUM_WEEK_DAYS
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            weekdays.forEach { weekDay: String ->
-                WeekDay(
-                    modifier = Modifier
-                        .requiredWidth(size)
-                        .requiredHeight(size),
-                    text = weekDay
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun WeekDay(
-    modifier: Modifier = Modifier,
-    text: String
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            maxLines = 1,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-private fun MonthDays(
-    currentYear: Int,
-    currentMonth: Int,
-    currentMonthNumberOfDays: Int,
-    todayYear: Int,
-    todayMonth: Int,
-    todayDayOfMonth: Int,
-    selectedYear: Int,
-    selectedMonth: Int,
-    selectedDayOfMonth: Int,
-    startOfMonthDayOfWeek: DayOfWeek,
-    onDayClick: (Int) -> Unit
-) {
-    Column {
-        val numberOfRows =
-            ceil((currentMonthNumberOfDays + startOfMonthDayOfWeek.value) / NUM_WEEK_DAYS.toDouble()).toInt()
-        var startDay = 1
-        repeat(numberOfRows) {
-            val startColumn = if (it == 0) startOfMonthDayOfWeek.value else 0
-            val endColumn = if (it != numberOfRows - 1) 6 else currentMonthNumberOfDays - startDay
-            MonthDaysRow(
-                startColumn = startColumn,
-                endColumn = endColumn,
-                fromDay = startDay,
-                currentYear = currentYear,
-                currentMonth = currentMonth,
-                todayYear = todayYear,
-                todayMonth = todayMonth,
-                todayDayOfMonth = todayDayOfMonth,
-                selectedYear = selectedYear,
-                selectedMonth = selectedMonth,
-                selectedDayOfMonth = selectedDayOfMonth,
-                onDayClick = onDayClick
-            )
-            startDay += endColumn - startColumn + 1
-        }
-    }
-}
-
-@Composable
-private fun MonthDaysRow(
-    startColumn: Int, // 0..6
-    endColumn: Int,   // 0..6 && startColumn <= endColumn
-    fromDay: Int,    // 1..31
-    currentYear: Int,
-    currentMonth: Int,
-    todayYear: Int,
-    todayMonth: Int,
-    todayDayOfMonth: Int,
-    selectedYear: Int,
-    selectedMonth: Int,
-    selectedDayOfMonth: Int,
-    onDayClick: (Int) -> Unit
-) {
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        val size = maxWidth / NUM_WEEK_DAYS
-        val modifier = Modifier
-            .requiredWidth(size)
-            .requiredHeight(size)
-        var currentDay = fromDay
-
-        Row {
-            repeat(NUM_WEEK_DAYS) { index: Int ->
-                if (index in startColumn..endColumn) {
-                    Day(
-                        modifier = modifier,
-                        day = currentDay,
-                        isSelected = currentYear == selectedYear && currentMonth == selectedMonth && currentDay == selectedDayOfMonth,
-                        isToday = currentYear == todayYear && currentMonth == todayMonth && currentDay == todayDayOfMonth,
-                        isHoliday = index == NUM_WEEK_DAYS - 1,
-                        onDayClick = onDayClick
-                    )
-                    currentDay++
-                } else {
-                    EmptyDay(
-                        modifier = modifier
-                    )
-                }
-            }
-        }
-
-    }
-}
-
-@Composable
-private fun Day(
-    modifier: Modifier = Modifier,
-    day: Int,
-    isSelected: Boolean,
-    isToday: Boolean,
-    isHoliday: Boolean,
-    onDayClick: (Int) -> Unit
-) {
-    Surface(
-        color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        shape = if (isSelected) MaterialTheme.shapes.medium else RectangleShape
-    ) {
-        var localModifier = modifier
-            .clickable {
-                onDayClick(day)
-            }
-        if (isToday) {
-            localModifier = localModifier.border(
-                width = 1.dp,
-                color = Color.Red,
-                shape = MaterialTheme.shapes.medium
-            )
-        }
-        Box(
-            modifier = localModifier,
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = day.toString(),
-                maxLines = 1,
-                textAlign = TextAlign.Center,
-                color = if (isHoliday) Color.Red else Color.Unspecified
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmptyDay(
-    modifier: Modifier = Modifier
-) {
-    Text(
-        modifier = modifier,
-        text = "",
-        maxLines = 1,
-        textAlign = TextAlign.Center
-    )
 }
 
 @Preview
