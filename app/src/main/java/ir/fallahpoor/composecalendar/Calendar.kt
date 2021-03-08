@@ -1,5 +1,6 @@
 package ir.fallahpoor.composecalendar
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -10,11 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ir.fallahpoor.composecalendar.ui.theme.ComposeCalendarTheme
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.ceil
 
@@ -35,44 +37,51 @@ private enum class DayOfWeek(val value: Int) {
 @Composable
 fun Calendar() {
 
-    val calendar = Calendar.getInstance()
-    val calendarStartOfMonth = Calendar.getInstance().apply {
+    val selectedCalendarStartOfMonth = Calendar.getInstance().apply {
         set(Calendar.DATE, 1)
     }
-    var currentDayOfMonth: Int by remember { mutableStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
-    var currentMonthName: String by remember { mutableStateOf(getMonthName(calendar)) }
+
+    val selectedCalendar = Calendar.getInstance()
+    val selectedYear: Int = selectedCalendar.get(Calendar.YEAR)
+    var selectedMonth: Int by remember { mutableStateOf(selectedCalendar.get(Calendar.MONTH)) }
+    var selectedDayOfMonth: Int by remember { mutableStateOf(selectedCalendar.get(Calendar.DAY_OF_MONTH)) }
+
+    val todayCalendar = Calendar.getInstance()
+    val todayYear = todayCalendar.get(Calendar.YEAR)
+    val todayMonth = todayCalendar.get(Calendar.MONTH)
+    val todayDayOfMonth = todayCalendar.get(Calendar.DAY_OF_MONTH)
 
     ComposeCalendarTheme {
         Surface {
             CalendarScreen(
-                year = calendar.get(Calendar.YEAR),
-                monthName = currentMonthName,
-                dayOfMonth = currentDayOfMonth,
-                numberOfDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH),
-                startOfMonthDayOfWeek = getDayOfWeek(calendarStartOfMonth.get(Calendar.DAY_OF_WEEK)),
-                onDayClick = { selectedDayOfMonth: Int ->
-                    if (selectedDayOfMonth != currentDayOfMonth) {
-                        currentDayOfMonth = selectedDayOfMonth
+                selectedYear = selectedYear,
+                selectedMonth = selectedMonth,
+                selectedDayOfMonth = selectedDayOfMonth,
+                todayYear = todayYear,
+                todayMonth = todayMonth,
+                todayDayOfMonth = todayDayOfMonth,
+                selectedMonthNumberOfDays = selectedCalendar.getActualMaximum(Calendar.DAY_OF_MONTH),
+                startOfMonthDayOfWeek = getDayOfWeek(selectedCalendarStartOfMonth.get(Calendar.DAY_OF_WEEK)),
+                onDayClick = { dayOfMonth: Int ->
+                    if (selectedDayOfMonth != dayOfMonth) {
+                        selectedDayOfMonth = dayOfMonth
                     }
                 },
                 onPreviousMonthClick = {
-                    calendar.add(Calendar.MONTH, -1)
-                    calendarStartOfMonth.add(Calendar.MONTH, -1)
-                    currentMonthName = getMonthName(calendar)
+                    selectedCalendar.add(Calendar.MONTH, -1)
+                    selectedCalendarStartOfMonth.add(Calendar.MONTH, -1)
+                    selectedMonth = selectedCalendar.get(Calendar.MONTH)
                 },
                 onNextMonthClick = {
-                    calendar.add(Calendar.MONTH, 1)
-                    calendarStartOfMonth.add(Calendar.MONTH, 1)
-                    currentMonthName = getMonthName(calendar)
+                    selectedCalendar.add(Calendar.MONTH, 1)
+                    selectedCalendarStartOfMonth.add(Calendar.MONTH, 1)
+                    selectedMonth = selectedCalendar.get(Calendar.MONTH)
                 }
             )
         }
     }
 
 }
-
-private fun getMonthName(calendar: Calendar): String =
-    SimpleDateFormat("MMMM").format(calendar.time)
 
 private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek {
     return when (dayOfWeek) {
@@ -89,10 +98,13 @@ private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek {
 
 @Composable
 private fun CalendarScreen(
-    year: Int,
-    monthName: String,
-    dayOfMonth: Int,
-    numberOfDaysInMonth: Int,
+    selectedYear: Int,
+    selectedMonth: Int,
+    selectedDayOfMonth: Int,
+    todayYear: Int,
+    todayMonth: Int,
+    todayDayOfMonth: Int,
+    selectedMonthNumberOfDays: Int,
     startOfMonthDayOfWeek: DayOfWeek,
     onDayClick: (Int) -> Unit,
     onPreviousMonthClick: () -> Unit,
@@ -102,16 +114,21 @@ private fun CalendarScreen(
         modifier = Modifier.fillMaxWidth()
     ) {
         Header(
-            year = year,
-            month = monthName,
+            selectedYear = selectedYear,
+            selectedMonth = selectedMonth,
             onPreviousMonthClick = onPreviousMonthClick,
             onNextMonthClick = onNextMonthClick
         )
         WeekDays()
         Divider()
         MonthDays(
-            dayOfMonth = dayOfMonth,
-            numberOfDaysInMonth = numberOfDaysInMonth,
+            selectedYear = selectedYear,
+            selectedMonth = selectedMonth,
+            selectedDayOfMonth = selectedDayOfMonth,
+            todayYear = todayYear,
+            todayMonth = todayMonth,
+            todayDayOfMonth = todayDayOfMonth,
+            selectedMonthNumberOfDays = selectedMonthNumberOfDays,
             startOfMonthDayOfWeek = startOfMonthDayOfWeek,
             onDayClick = onDayClick
         )
@@ -120,8 +137,8 @@ private fun CalendarScreen(
 
 @Composable
 private fun Header(
-    year: Int,
-    month: String,
+    selectedYear: Int,
+    selectedMonth: Int,
     onPreviousMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit
 ) {
@@ -141,7 +158,7 @@ private fun Header(
             modifier = Modifier
                 .weight(1f)
                 .padding(16.dp),
-            text = "$month $year",
+            text = "${getMonthName(selectedMonth)} $selectedYear",
             textAlign = TextAlign.Center
         )
         IconButton(
@@ -154,6 +171,23 @@ private fun Header(
         }
     }
 }
+
+private fun getMonthName(month: Int): String =
+    when (month) {
+        0 -> "January"
+        1 -> "February"
+        2 -> "March"
+        3 -> "April"
+        4 -> "May"
+        5 -> "June"
+        6 -> "July"
+        7 -> "August"
+        8 -> "September"
+        9 -> "October"
+        10 -> "November"
+        11 -> "December"
+        else -> throw IllegalArgumentException("month must be in range [0..11]")
+    }
 
 @Composable
 private fun WeekDays() {
@@ -196,23 +230,33 @@ private fun WeekDay(
 
 @Composable
 private fun MonthDays(
-    dayOfMonth: Int,
-    numberOfDaysInMonth: Int,
+    selectedYear: Int,
+    selectedMonth: Int,
+    selectedDayOfMonth: Int,
+    todayYear: Int,
+    todayMonth: Int,
+    todayDayOfMonth: Int,
+    selectedMonthNumberOfDays: Int,
     startOfMonthDayOfWeek: DayOfWeek,
     onDayClick: (Int) -> Unit
 ) {
     Column {
         val numberOfRows =
-            ceil((numberOfDaysInMonth + startOfMonthDayOfWeek.value) / NUM_WEEK_DAYS.toDouble()).toInt()
+            ceil((selectedMonthNumberOfDays + startOfMonthDayOfWeek.value) / NUM_WEEK_DAYS.toDouble()).toInt()
         var startDay = 1
         repeat(numberOfRows) {
             val startColumn = if (it == 0) startOfMonthDayOfWeek.value else 0
-            val endColumn = if (it != numberOfRows - 1) 6 else numberOfDaysInMonth - startDay
+            val endColumn = if (it != numberOfRows - 1) 6 else selectedMonthNumberOfDays - startDay
             MonthDaysRow(
                 startColumn = startColumn,
                 endColumn = endColumn,
                 startDay = startDay,
-                currentDayOfMonth = dayOfMonth,
+                selectedYear = selectedYear,
+                selectedMonth = selectedMonth,
+                selectedDayOfMonth = selectedDayOfMonth,
+                todayYear = todayYear,
+                todayMonth = todayMonth,
+                todayDayOfMonth = todayDayOfMonth,
                 onDayClick = onDayClick
             )
             startDay += endColumn - startColumn + 1
@@ -225,7 +269,12 @@ private fun MonthDaysRow(
     startColumn: Int, // 0..6
     endColumn: Int,   // 0..6 && startColumn <= endColumn
     startDay: Int,    // 1..31
-    currentDayOfMonth: Int,
+    selectedYear: Int,
+    selectedMonth: Int,
+    selectedDayOfMonth: Int,
+    todayYear: Int,
+    todayMonth: Int,
+    todayDayOfMonth: Int,
     onDayClick: (Int) -> Unit
 ) {
     BoxWithConstraints(
@@ -241,16 +290,17 @@ private fun MonthDaysRow(
         Row {
             repeat(NUM_WEEK_DAYS) { index: Int ->
                 if (index in startColumn..endColumn) {
-                    MonthDay(
+                    Day(
                         modifier = modifier,
                         day = startDayLocal,
-                        isSelected = startDayLocal == currentDayOfMonth,
+                        isSelected = startDayLocal == selectedDayOfMonth,
+                        isToday = selectedYear == todayYear && selectedMonth == todayMonth && startDayLocal == todayDayOfMonth,
                         isHoliday = index == NUM_WEEK_DAYS - 1,
                         onDayClick = onDayClick
                     )
                     startDayLocal++
                 } else {
-                    EmptyMonthDay(
+                    EmptyDay(
                         modifier = modifier
                     )
                 }
@@ -261,21 +311,41 @@ private fun MonthDaysRow(
 }
 
 @Composable
-private fun MonthDay(
+private fun Day(
     modifier: Modifier = Modifier,
     day: Int,
     isSelected: Boolean,
+    isToday: Boolean,
     isHoliday: Boolean,
     onDayClick: (Int) -> Unit
 ) {
-    val color = if (isSelected) MaterialTheme.colors.primary else Color.Unspecified
+    val color: Color
+    val shape: Shape
+    if (isSelected) {
+        color = MaterialTheme.colors.primary
+        shape = MaterialTheme.shapes.medium
+    } else {
+        color = Color.Unspecified
+        shape = RectangleShape
+    }
     Surface(
-        color = color
+        color = color,
+        shape = shape
     ) {
-        Box(
-            modifier = modifier.clickable {
+        var m = modifier
+            .clickable {
                 onDayClick(day)
-            },
+            }
+        if (isToday) {
+            m = modifier
+                .border(
+                    width = 1.dp,
+                    color = Color.Red,
+                    shape = MaterialTheme.shapes.medium
+                )
+        }
+        Box(
+            modifier = m,
             contentAlignment = Alignment.Center
         ) {
             val textColor = if (isHoliday) Color.Red else Color.Unspecified
@@ -290,7 +360,7 @@ private fun MonthDay(
 }
 
 @Composable
-private fun EmptyMonthDay(
+private fun EmptyDay(
     modifier: Modifier = Modifier
 ) {
     Text(
@@ -307,11 +377,14 @@ private fun CalendarScreenPreview() {
     ComposeCalendarTheme {
         Surface {
             CalendarScreen(
-                year = 2021,
-                monthName = "June",
-                numberOfDaysInMonth = 30,
+                selectedYear = 2021,
+                selectedMonth = 2,
+                selectedDayOfMonth = 12,
+                todayYear = 2021,
+                todayMonth = 2,
+                todayDayOfMonth = 12,
+                selectedMonthNumberOfDays = 30,
                 startOfMonthDayOfWeek = DayOfWeek.Sunday,
-                dayOfMonth = 20,
                 onDayClick = {},
                 onPreviousMonthClick = {},
                 onNextMonthClick = {}
