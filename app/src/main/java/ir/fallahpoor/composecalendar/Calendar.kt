@@ -302,20 +302,20 @@ private fun MonthDaysRow(
         val modifier = Modifier
             .requiredWidth(size)
             .requiredHeight(size)
-        var startDayLocal = startDay
+        var currentDay = startDay
 
         Row {
             repeat(NUM_WEEK_DAYS) { index: Int ->
                 if (index in startColumn..endColumn) {
                     Day(
                         modifier = modifier,
-                        day = startDayLocal,
-                        isSelected = selectedYear == currentYear && selectedMonth == currentMonth && startDayLocal == selectedDayOfMonth,
-                        isToday = currentYear == todayYear && currentMonth == todayMonth && startDayLocal == todayDayOfMonth,
+                        day = currentDay,
+                        isSelected = currentYear == selectedYear && currentMonth == selectedMonth && currentDay == selectedDayOfMonth,
+                        isToday = currentYear == todayYear && currentMonth == todayMonth && currentDay == todayDayOfMonth,
                         isHoliday = index == NUM_WEEK_DAYS - 1,
                         onDayClick = onDayClick
                     )
-                    startDayLocal++
+                    currentDay++
                 } else {
                     EmptyDay(
                         modifier = modifier
@@ -349,20 +349,19 @@ private fun Day(
         color = color,
         shape = shape
     ) {
-        var m = modifier
+        var localModifier = modifier
             .clickable {
                 onDayClick(day)
             }
         if (isToday) {
-            m = modifier
-                .border(
-                    width = 1.dp,
-                    color = Color.Red,
-                    shape = MaterialTheme.shapes.medium
-                )
+            localModifier = localModifier.border(
+                width = 1.dp,
+                color = Color.Red,
+                shape = MaterialTheme.shapes.medium
+            )
         }
         Box(
-            modifier = m,
+            modifier = localModifier,
             contentAlignment = Alignment.Center
         ) {
             val textColor = if (isHoliday) Color.Red else Color.Unspecified
