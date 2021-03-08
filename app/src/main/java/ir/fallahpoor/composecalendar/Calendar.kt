@@ -45,9 +45,9 @@ fun Calendar() {
     ComposeCalendarTheme {
         Surface {
             CalendarScreen(
-                currentYear = calendar.get(Calendar.YEAR),
-                currentMonthName = currentMonthName,
-                currentDayOfMonth = currentDayOfMonth,
+                year = calendar.get(Calendar.YEAR),
+                monthName = currentMonthName,
+                dayOfMonth = currentDayOfMonth,
                 numberOfDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH),
                 startOfMonthDayOfWeek = getDayOfWeek(calendarStartOfMonth.get(Calendar.DAY_OF_WEEK)),
                 onDayClick = { selectedDayOfMonth: Int ->
@@ -89,9 +89,9 @@ private fun getDayOfWeek(dayOfWeek: Int): DayOfWeek {
 
 @Composable
 private fun CalendarScreen(
-    currentYear: Int,
-    currentMonthName: String,
-    currentDayOfMonth: Int,
+    year: Int,
+    monthName: String,
+    dayOfMonth: Int,
     numberOfDaysInMonth: Int,
     startOfMonthDayOfWeek: DayOfWeek,
     onDayClick: (Int) -> Unit,
@@ -102,15 +102,15 @@ private fun CalendarScreen(
         modifier = Modifier.fillMaxWidth()
     ) {
         Header(
-            currentYear = currentYear,
-            currentMonth = currentMonthName,
+            year = year,
+            month = monthName,
             onPreviousMonthClick = onPreviousMonthClick,
             onNextMonthClick = onNextMonthClick
         )
         WeekDays()
         Divider()
         MonthDays(
-            currentDayOfMonth = currentDayOfMonth,
+            dayOfMonth = dayOfMonth,
             numberOfDaysInMonth = numberOfDaysInMonth,
             startOfMonthDayOfWeek = startOfMonthDayOfWeek,
             onDayClick = onDayClick
@@ -120,8 +120,8 @@ private fun CalendarScreen(
 
 @Composable
 private fun Header(
-    currentYear: Int,
-    currentMonth: String,
+    year: Int,
+    month: String,
     onPreviousMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit
 ) {
@@ -141,7 +141,7 @@ private fun Header(
             modifier = Modifier
                 .weight(1f)
                 .padding(16.dp),
-            text = "$currentMonth $currentYear",
+            text = "$month $year",
             textAlign = TextAlign.Center
         )
         IconButton(
@@ -196,7 +196,7 @@ private fun WeekDay(
 
 @Composable
 private fun MonthDays(
-    currentDayOfMonth: Int,
+    dayOfMonth: Int,
     numberOfDaysInMonth: Int,
     startOfMonthDayOfWeek: DayOfWeek,
     onDayClick: (Int) -> Unit
@@ -212,7 +212,7 @@ private fun MonthDays(
                 startColumn = startColumn,
                 endColumn = endColumn,
                 startDay = startDay,
-                currentDayOfMonth = currentDayOfMonth,
+                currentDayOfMonth = dayOfMonth,
                 onDayClick = onDayClick
             )
             startDay += endColumn - startColumn + 1
@@ -307,11 +307,11 @@ private fun CalendarScreenPreview() {
     ComposeCalendarTheme {
         Surface {
             CalendarScreen(
-                currentYear = 2021,
-                currentMonthName = "June",
+                year = 2021,
+                monthName = "June",
                 numberOfDaysInMonth = 30,
                 startOfMonthDayOfWeek = DayOfWeek.Sunday,
-                currentDayOfMonth = 20,
+                dayOfMonth = 20,
                 onDayClick = {},
                 onPreviousMonthClick = {},
                 onNextMonthClick = {}
