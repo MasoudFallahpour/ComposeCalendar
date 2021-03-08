@@ -1,4 +1,4 @@
-package ir.fallahpoor.composecalendar.ui.theme
+package ir.fallahpoor.composecalendar.theme
 
 import androidx.compose.ui.graphics.Color
 

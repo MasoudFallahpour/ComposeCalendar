@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ir.fallahpoor.composecalendar.composables.DaysSheet
 import ir.fallahpoor.composecalendar.composables.WeekDayNames
-import ir.fallahpoor.composecalendar.ui.theme.ComposeCalendarTheme
+import ir.fallahpoor.composecalendar.theme.ComposeCalendarTheme
 import java.util.*
 
 // FIXME: In landscape mode, calendar is not scrollable
