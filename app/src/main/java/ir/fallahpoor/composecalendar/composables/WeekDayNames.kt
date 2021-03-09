@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 
 private const val NUM_WEEK_DAYS = 7
 private val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
@@ -15,15 +16,15 @@ fun WeekDayNames() {
     BoxWithConstraints(
         modifier = Modifier.fillMaxWidth()
     ) {
-        val size = maxWidth / NUM_WEEK_DAYS
+        val width = maxWidth / NUM_WEEK_DAYS
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
             weekdays.forEach { weekDay: String ->
                 WeekDay(
                     modifier = Modifier
-                        .requiredWidth(size)
-                        .requiredHeight(size),
+                        .requiredWidth(width)
+                        .requiredHeight(50.dp),
                     text = weekDay
                 )
             }
