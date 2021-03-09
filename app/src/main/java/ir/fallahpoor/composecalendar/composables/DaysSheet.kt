@@ -1,6 +1,8 @@
 package ir.fallahpoor.composecalendar.composables
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import ir.fallahpoor.composecalendar.DayOfWeek
@@ -22,7 +24,11 @@ fun DaysSheet(
     startOfMonthDayOfWeek: DayOfWeek,
     onDayClick: (Int) -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+    ) {
         val numberOfRows =
             ceil((currentMonthNumberOfDays + startOfMonthDayOfWeek.value) / NUM_WEEK_DAYS.toDouble()).toInt()
         var startDay = 1

@@ -19,8 +19,6 @@ import ir.fallahpoor.composecalendar.composables.WeekDayNames
 import ir.fallahpoor.composecalendar.theme.ComposeCalendarTheme
 import java.util.*
 
-// FIXME: In landscape mode, calendar is not scrollable
-
 enum class DayOfWeek(val value: Int) {
     Monday(0),
     Tuesday(1),
