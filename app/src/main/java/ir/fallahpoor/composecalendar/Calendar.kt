@@ -15,9 +15,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ir.fallahpoor.composecalendar.composables.DaysSheet
 import ir.fallahpoor.composecalendar.composables.WeekDayNames
 import ir.fallahpoor.composecalendar.theme.ComposeCalendarTheme
@@ -157,9 +161,7 @@ private fun CalendarScreen(
             selectedMonth = selectedMonth,
             selectedDayOfMonth = selectedDayOfMonth,
             startOfMonthDayOfWeek = startOfMonthDayOfWeek,
-            onDayClick = {
-                onDateClick(currentYear, currentMonth, it)
-            }
+            onDateClick = onDateClick
         )
     }
 }
@@ -175,29 +177,40 @@ private fun Header(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
+        ChangeMonthButton(
+            imageVector = Icons.Default.KeyboardArrowLeft,
+            contentDescription = "Previous Month",
             onClick = onPreviousMonthClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowLeft,
-                contentDescription = "Previous Month"
-            )
-        }
+        )
         Text(
             modifier = Modifier
                 .weight(1f)
                 .padding(16.dp),
             text = "${monthNames[currentMonth]} $currentYear",
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            style = TextStyle(fontWeight = FontWeight.W700, fontSize = 16.sp)
         )
-        IconButton(
+        ChangeMonthButton(
+            imageVector = Icons.Default.KeyboardArrowRight,
+            contentDescription = "Next Month",
             onClick = onNextMonthClick
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowRight,
-                contentDescription = "Next Month"
-            )
-        }
+        )
+    }
+}
+
+@Composable
+private fun ChangeMonthButton(
+    imageVector: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription
+        )
     }
 }
 
