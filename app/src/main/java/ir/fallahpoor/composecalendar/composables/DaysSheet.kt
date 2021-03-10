@@ -22,7 +22,7 @@ fun DaysSheet(
     selectedMonth: Int,
     selectedDayOfMonth: Int,
     startOfMonthDayOfWeek: DayOfWeek,
-    onDayClick: (Int) -> Unit
+    onDateClick: (Int, Int, Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -47,7 +47,7 @@ fun DaysSheet(
                 selectedYear = selectedYear,
                 selectedMonth = selectedMonth,
                 selectedDayOfMonth = selectedDayOfMonth,
-                onDayClick = onDayClick
+                onDateClick = onDateClick
             )
             startDay += endColumn - startColumn + 1
         }
@@ -67,7 +67,7 @@ private fun DaysRow(
     selectedYear: Int,
     selectedMonth: Int,
     selectedDayOfMonth: Int,
-    onDayClick: (Int) -> Unit
+    onDateClick: (Int, Int, Int) -> Unit
 ) {
     BoxWithConstraints(
         modifier = Modifier.fillMaxWidth()
@@ -88,7 +88,9 @@ private fun DaysRow(
                         isSelected = currentYear == selectedYear && currentMonth == selectedMonth && currentDay == selectedDayOfMonth,
                         isToday = currentYear == todayYear && currentMonth == todayMonth && currentDay == todayDayOfMonth,
                         isHoliday = index == NUM_WEEK_DAYS - 1,
-                        onDayClick = onDayClick
+                        onDayClick = { day: Int ->
+                            onDateClick(currentYear, currentMonth, day)
+                        }
                     )
                     currentDay++
                 } else {
