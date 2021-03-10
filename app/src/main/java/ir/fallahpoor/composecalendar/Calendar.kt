@@ -8,7 +8,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -47,29 +51,33 @@ private val monthNames = listOf(
 @Composable
 fun Calendar() {
 
-    val currentCalendarStartOfMonth = Calendar.getInstance().apply {
-        set(Calendar.DATE, 1)
+    val currentCalendarStartOfMonth = rememberSaveable {
+        Calendar.getInstance().apply {
+            set(Calendar.DATE, 1)
+        }
     }
 
-    val currentDate = Calendar.getInstance()
-    var currentYear: Int by remember { mutableStateOf(currentDate.get(Calendar.YEAR)) }
-    var currentMonth: Int by remember { mutableStateOf(currentDate.get(Calendar.MONTH)) }
+    val currentDate = rememberSaveable { Calendar.getInstance() }
+    var currentYear by rememberSaveable { mutableStateOf(currentDate.get(Calendar.YEAR)) }
+    var currentMonth by rememberSaveable { mutableStateOf(currentDate.get(Calendar.MONTH)) }
+    val currentMonthNumberOfDays =
+        rememberSaveable { currentDate.getActualMaximum(Calendar.DAY_OF_MONTH) }
 
     val todayDate = Calendar.getInstance()
     val todayYear = todayDate.get(Calendar.YEAR)
     val todayMonth = todayDate.get(Calendar.MONTH)
     val todayDayOfMonth = todayDate.get(Calendar.DAY_OF_MONTH)
 
-    var selectedYear: Int = todayDate.get(Calendar.YEAR)
-    var selectedMonth: Int = todayDate.get(Calendar.MONTH)
-    var selectedDayOfMonth: Int by remember { mutableStateOf(currentDate.get(Calendar.DAY_OF_MONTH)) }
+    var selectedYear by rememberSaveable { mutableStateOf(todayDate.get(Calendar.YEAR)) }
+    var selectedMonth by rememberSaveable { mutableStateOf(todayDate.get(Calendar.MONTH)) }
+    var selectedDayOfMonth by rememberSaveable { mutableStateOf(currentDate.get(Calendar.DAY_OF_MONTH)) }
 
     ComposeCalendarTheme {
         Surface {
             CalendarScreen(
                 currentYear = currentYear,
                 currentMonth = currentMonth,
-                currentMonthNumberOfDays = currentDate.getActualMaximum(Calendar.DAY_OF_MONTH),
+                currentMonthNumberOfDays = currentMonthNumberOfDays,
                 todayYear = todayYear,
                 todayMonth = todayMonth,
                 todayDayOfMonth = todayDayOfMonth,
