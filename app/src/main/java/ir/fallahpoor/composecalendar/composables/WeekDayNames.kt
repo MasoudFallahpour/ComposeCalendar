@@ -16,13 +16,9 @@ private val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 @Composable
 fun WeekDayNames() {
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val width = maxWidth / NUM_WEEK_DAYS
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             weekdays.forEach { weekDay: String ->
                 WeekDay(
                     modifier = Modifier

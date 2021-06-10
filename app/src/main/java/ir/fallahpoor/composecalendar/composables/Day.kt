@@ -53,9 +53,7 @@ fun Day(
 }
 
 @Composable
-fun EmptyDay(
-    modifier: Modifier = Modifier
-) {
+fun EmptyDay(modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
         text = "",

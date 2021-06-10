@@ -69,9 +69,7 @@ private fun DaysRow(
     selectedDayOfMonth: Int,
     onDateClick: (Int, Int, Int) -> Unit
 ) {
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
 
         val size = maxWidth / NUM_WEEK_DAYS
         val modifier = Modifier
@@ -94,9 +92,7 @@ private fun DaysRow(
                     )
                     currentDay++
                 } else {
-                    EmptyDay(
-                        modifier = modifier
-                    )
+                    EmptyDay(modifier = modifier)
                 }
             }
         }

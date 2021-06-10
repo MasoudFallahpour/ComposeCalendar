@@ -139,9 +139,7 @@ private fun CalendarScreen(
     onPreviousMonthClick: () -> Unit,
     onNextMonthClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Header(
             currentYear = currentYear,
             currentMonth = currentMonth,
@@ -204,9 +202,7 @@ private fun ChangeMonthButton(
     contentDescription: String,
     onClick: () -> Unit
 ) {
-    IconButton(
-        onClick = onClick
-    ) {
+    IconButton(onClick = onClick) {
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription
