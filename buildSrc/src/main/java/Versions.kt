@@ -8,6 +8,6 @@ object Versions {
     const val versionCode = 1
     const val versionName = "0.1"
 
-    const val kotlinVersion = "1.4.30"
-    const val composeVersion = "1.0.0-beta01"
+    const val kotlinVersion = "1.5.10"
+    const val composeVersion = "1.0.0-beta08"
 }
