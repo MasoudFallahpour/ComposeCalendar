@@ -3,9 +3,9 @@ object Dependencies {
     object App {
         const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinVersion}"
         const val core = "androidx.core:core-ktx:1.3.2"
-        const val appCompat = "androidx.appcompat:appcompat:1.2.0"
+        const val appCompat = "androidx.appcompat:appcompat:1.3.0"
         const val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:2.3.0"
-        const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha03"
+        const val activityCompose = "androidx.activity:activity-compose:1.3.0"
         const val material = "com.google.android.material:material:1.3.0"
 
         const val composeUi = "androidx.compose.ui:ui:${Versions.composeVersion}"
